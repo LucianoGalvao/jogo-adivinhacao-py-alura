@@ -1,47 +1,173 @@
 
-print("*********************************")
-print("Bem vindo ao jogo de adivinhação!")
-print("*********************************")
 import random
 
-numero_secreto = random.randint(1,10)
-numero_tentativas = 3
-rodada = 1
-nome = input("Qual o seu nome? ")
-print()
-print("Olá {}, estou pensando em um número de 1 a 10.".format(nome)) 
-print("Você tem apenas 3 tentativas para acertar.") 
+def jogar():
 
-for rodada in range(1, numero_tentativas + 1):
-  print("Tentativa {} de {}".format(rodada,numero_tentativas))
-  print()
-  chute = input("Digite seu chute: ")
-  chute = int(chute)
-  
-  acertou = chute == numero_secreto
-  maior = chute > numero_secreto
-  menor = chute < numero_secreto
-
-  if(acertou):
-    rodadaStr = str(rodada)
+    bem_vindo()
+    palavra_secreta = carrega_palavra_secreta()
+    nome = pede_nome()
+    letras_acertadas = inicializa_letras_acertadas(palavra_secreta)
+    print(letras_acertadas)
     print()
-    if(rodada == 1):
-      print("Parabéns, você acertou em {} tentativa.".format(rodadaStr))
-    elif(rodada != 1):
-      print("Parabéns, você acertou em {} tentativas.".format(rodadaStr))
-    break
+     
+    enforcou = False
+    acertou = False
+    erros = 0    
 
-  else:
-    if(maior):
-      print("Lamento, mas meu número é menor!")
-    elif(menor):
-      print("Lamento, mas meu número é maior!")
+    while(not enforcou and not acertou):
+      chute = pede_chute()
+      if(chute in palavra_secreta):
+        marca_chute_correto(chute, letras_acertadas, palavra_secreta)
+      else:
+        erros += 1
+        desenha_forca(erros)
+
+      enforcou = erros == 7
+      acertou = "_" not in letras_acertadas
+
+      print(letras_acertadas)
+
+    if(acertou):
+      mensagem_vencedor(nome, palavra_secreta)
+    elif(enforcou):
+      mensagem_perdedor(nome)       
+
+    print()
+    print("Fim de jogo!")
+    print()
+
+
+#DEFINIÇÕES-ABAIXO
+
+
+def bem_vindo():
+    print("********************************")
+    print("***Bem vindo ao jogo de forca***")
+    print("********************************")
+    print()
+
+def pede_nome():
+    nome = input("Por favor, digite seu nome: ")
+
+    print("Olá {}, estou pensando em uma palavra secreta, você é capaz de acertar?".format(nome))
+    print()
+    return nome
+
+def carrega_palavra_secreta():
+    arquivo = open("palavras.txt", "r")
+    palavras = []
+
+    for linha in arquivo:
+        linha = linha.strip()
+        palavras.append(linha)
+
+    arquivo.close()
+    numero = random.randrange(0,len(palavras))
+    palavra_secreta = palavras[numero].upper()
+    return palavra_secreta
+
+def inicializa_letras_acertadas(palavra):
+  return ["_" for letra in palavra]
+
+def pede_chute():
+    chute = input("Qual letra? ")
+    chute = chute.strip().upper()
+    return chute
+
+def marca_chute_correto(chute, letras_acertadas, palavra_secreta):
+  index = 0
+  for letra in palavra_secreta:
+      if(chute == letra):
+          letras_acertadas[index] = letra
+      index += 1
+
+def mensagem_vencedor(nome, palavra_secreta):
   print()
-      
-if(rodada > 3):
-  print("Que pena {}, mas você gastou todas as suas tentativas!".format(nome))
-  numero_secreto = str(numero_secreto)
-  print("Eu estava pensando no número {}".format(numero_secreto))
+  print("Parabéns {}! Você acertou, a palavra secreta era \"{}\"!".format(nome,palavra_secreta))    
+  print()
+  print("Parabéns, você ganhou!")
+  print("       ___________      ")
+  print("      '._==_==_=_.'     ")
+  print("      .-\\:      /-.    ")
+  print("     | (|:.     |) |    ")
+  print("      '-|:.     |-'     ")
+  print("        \\::.    /      ")
+  print("         '::. .'        ")
+  print("           ) (          ")
+  print("         _.' '._        ")
+  print("        '-------'       ")
+  
 
-print()
-print("Fim de jogo!")
+def mensagem_perdedor(nome):
+  print()
+  print("Que pena {}! Infelizmente você não conseguiu acertar a palavra secreta e foi enforcado!".format(nome))
+  print()
+  print("    _______________         ")
+  print("   /               \       ")
+  print("  /                 \      ")
+  print("//                   \/\  ")
+  print("\|   XXXX     XXXX   | /   ")
+  print(" |   XXXX     XXXX   |/     ")
+  print(" |   XXX       XXX   |      ")
+  print(" |                   |      ")
+  print(" \__      XXX      __/     ")
+  print("   |\     XXX     /|       ")
+  print("   | |           | |        ")
+  print("   | I I I I I I I |        ")
+  print("   |  I I I I I I  |        ")
+  print("   \_             _/       ")
+  print("     \_         _/         ")
+  print("       \_______/           ")
+
+def desenha_forca(erros):
+  print("  _______     ")
+  print(" |/      |    ")
+
+  if(erros == 1):
+      print(" |      (_)   ")
+      print(" |            ")
+      print(" |            ")
+      print(" |            ")
+
+  if(erros == 2):
+      print(" |      (_)   ")
+      print(" |      \     ")
+      print(" |            ")
+      print(" |            ")
+
+  if(erros == 3):
+      print(" |      (_)   ")
+      print(" |      \|    ")
+      print(" |            ")
+      print(" |            ")
+
+  if(erros == 4):
+      print(" |      (_)   ")
+      print(" |      \|/   ")
+      print(" |            ")
+      print(" |            ")
+
+  if(erros == 5):
+      print(" |      (_)   ")
+      print(" |      \|/   ")
+      print(" |       |    ")
+      print(" |            ")
+
+  if(erros == 6):
+      print(" |      (_)   ")
+      print(" |      \|/   ")
+      print(" |       |    ")
+      print(" |      /     ")
+
+  if (erros == 7):
+      print(" |      (_)   ")
+      print(" |      \|/   ")
+      print(" |       |    ")
+      print(" |      / \   ")
+
+  print(" |            ")
+  print("_|___         ")
+  print()
+
+if( __name__ == "__main__"):
+    jogar()
